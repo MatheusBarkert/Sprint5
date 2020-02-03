@@ -19,6 +19,10 @@ public class Estoque implements Comparator<Produto>{
 		return quantidade;
 	}
 	
+	public void setQuantidade(int quantidade) {
+		this.quantidade = quantidade;
+	}
+	
 	@Override
 	public String toString() {
 		

@@ -1,29 +1,26 @@
 package desafioSprint5;
 
-import java.util.List;
 import java.util.Scanner;
-
-import DAO.ClienteDAO;
-import DAO.ProdutoDAO;
 
 public class App {
 
 	public static void main(String[] args) throws Exception {
 		Scanner sc = new Scanner(System.in);
 		Menus menus = new Menus();
-		ProdutoDAO produtoDAO = new ProdutoDAO();
-		ClienteDAO clienteDAO = new ClienteDAO();
-		//int opcao = 0;
+		int opcao = 0;
 		boolean flag = true;
-		
-		do{
-			
+
+		do {
+
 			menus.menuPrincipal();
-			int opcao = Integer.parseInt(sc.nextLine());
-			
+			try {
+				opcao = Integer.parseInt(sc.nextLine());
+			} catch (NumberFormatException ex) {
+				System.out.println("Este campo não pode ser vázio ou conter letras! " + ex);
+			}
+
 			switch (opcao) {
 			case 1:
-				//List<Produto> lstProdutos = menus.retornaListaDeProdutos();
 				menus.verificaEstoque();
 				break;
 
@@ -38,17 +35,17 @@ public class App {
 			case 4:
 				menus.cadastraCliente(sc);
 				break;
-				
-			case 5: 
+
+			case 5:
 				flag = false;
 				break;
-			
+
 			default:
 				System.out.println("Opção inválida!");
-				
+
 			}
-			
-		}while(flag);
+
+		} while (flag);
 
 		System.out.println("Programa Encerrado!");
 	}

@@ -60,6 +60,7 @@ public class EstoqueDAO {
 		try {
 		ObjectMapper xmlMapper = new XmlMapper();
 		
+		
 		xmlMapper.writeValue(new File("Estoque.xml"), lstEstoque);
 		}catch(IOException ex) {
 			System.out.println("Não foi possivel encontrar o arquivo! " + ex);
