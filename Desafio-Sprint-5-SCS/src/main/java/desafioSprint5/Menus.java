@@ -26,7 +26,7 @@ public class Menus {
 	private ClienteDAO clienteDAO = new ClienteDAO();
 	private ProdutoDAO produtoDAO = new ProdutoDAO();
 	private Pedido pedido = new Pedido();
-
+	private Produto produto = new Produto();
 	int opcao = 0;
 
 	public void menuPrincipal() {
@@ -50,6 +50,7 @@ public class Menus {
 	public void realizaPedido(Scanner sc) throws ParserConfigurationException, SAXException, IOException {// <--------rever
 
 		// limpo a lista para nao dar problema de sobrescrita
+		
 		lstProdutos.clear();
 		lstProdutos = produtoDAO.leituraProduto();
 		lstClientes.clear();
@@ -65,20 +66,17 @@ public class Menus {
 			System.out.println("Qual item deseja comprar?");
 			String descricaoProduto = sc.nextLine();
 
-			if (pedido.verificaProduto(descricaoProduto, lstProdutos)) {// lista esta vazia
+			if (pedido.verificaProduto(descricaoProduto, lstProdutos)) {
 
 				System.out.println("Qual a quantidade que deseja comprar?");
 				int quantidadePedido = Integer.parseInt(sc.nextLine());
 
-				
 				pedido.verificaQuantidade(descricaoProduto, lstEstoque, quantidadePedido);
-				
-				
 
 			} else {
 				System.out.println("O produto '" + descricaoProduto + "' não foi encontrado em nosso Estoque!");
 			}
-			
+
 		} else {
 			System.out.println("O cliente ainda nao esta cadastrado!");
 			System.out.println("1 - Cadastrar cliente");
@@ -94,7 +92,6 @@ public class Menus {
 
 		estoqueDAO.guardaListaEstoque(lstEstoque);
 
-
 	}
 
 	public void cadastraProduto(Scanner sc) throws ParserConfigurationException, SAXException, IOException {
@@ -105,23 +102,57 @@ public class Menus {
 		System.out.println("Digite a descrição do produto:");
 		String descricao = sc.nextLine();
 
-		System.out.println("Digite o preço do produto:");
-		double preco = Double.parseDouble(sc.nextLine());
+		if (produto.verificaProdutoExistente(descricao, lstProdutos)) {
+			System.out.println("O produto '" + descricao + "' ja existe em nosso estoque, deseja alterar seus dados?");
+			System.out.println("1- alterar dados");
+			System.out.println("2- voltar ao menu principal");
+			opcao = Integer.parseInt(sc.nextLine());
 
-		System.out.println("Quantos desse produto entrarão no estoque?");
-		int quantidade = Integer.parseInt(sc.nextLine());
+			if (opcao == 1) {
+				System.out.println("Digite o preço do produto '" + descricao + "':");
+				double preco = Double.parseDouble(sc.nextLine());
 
-		Produto produto = new Produto(descricao, preco);
-		lstProdutos.add(produto);
+				System.out.println("Quantas unidades do produto '" + descricao + "' serão adicionados ao estoque?");
+				int quantidade = Integer.parseInt(sc.nextLine());
 
-		Estoque estoque = new Estoque(produto, quantidade);
-		lstEstoque.add(estoque);// <---------------- Possivel Problema
+				for (int i = 0; i < lstProdutos.size(); i++) {//esta adicionando a quantidade e preco para todos
+					
+					if (produto.verificaProdutoExistente(descricao, lstProdutos)) {
+						lstProdutos.get(i).setPreco(preco);
+						lstEstoque.get(i).setProduto(lstProdutos.get(i));
+						lstEstoque.get(i).adicionarQuantidadeAoProduto(lstProdutos.get(i), quantidade);
+						break;
+					}
+					
+				}
 
-		System.out.println("Produto cadastrado com sucesso!");
+				estoqueDAO.guardaListaEstoque(lstEstoque);
+				produtoDAO.guardaListaProdutos(lstProdutos);
 
-		estoqueDAO.guardaListaEstoque(lstEstoque);
-		produtoDAO.guardaListaProdutos(lstProdutos);
+			} else {
+				System.out.println("Voltando ao menu principal...");
+				return;
+			}
 
+		} else {
+
+			System.out.println("Digite o preço do produto:");
+			double preco = Double.parseDouble(sc.nextLine());
+
+			System.out.println("Quantos desse produto entrarão no estoque?");
+			int quantidade = Integer.parseInt(sc.nextLine());
+
+			Produto produto = new Produto(descricao, preco);
+			lstProdutos.add(produto);
+
+			Estoque estoque = new Estoque(produto, quantidade);
+			lstEstoque.add(estoque);// <---------------- Possivel Problema
+
+			System.out.println("Produto cadastrado com sucesso!");
+
+			estoqueDAO.guardaListaEstoque(lstEstoque);
+			produtoDAO.guardaListaProdutos(lstProdutos);
+		}
 	}
 
 	public void cadastraCliente(Scanner sc) throws ParserConfigurationException, SAXException, IOException {
@@ -140,17 +171,6 @@ public class Menus {
 		lstClientes.add(cliente); // <----------------- Possivel Problema
 
 		clienteDAO.escritaClientes(lstClientes);
-	}
-
-	public List<Produto> retornaListaDeProdutos() {
-
-		return lstProdutos;
-
-	}
-
-	public List<Cliente> retornaListaDeClientes() {
-
-		return lstClientes;
 	}
 
 }
